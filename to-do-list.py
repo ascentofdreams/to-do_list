@@ -6,21 +6,21 @@ def add_task():
     print("Чтобы добавить задачу, пожалуйста введите название. (m) - возврат к меню")
     task_name = input()
     if task_name.lower() in {'m', 'q'}:
-        action_menu(task_name.lower())
+        action_menu(task_name.lower())  # Проверяем на наличие вызовов действий
     else:
         with open(f'{getcwd()}/tasks.txt', mode='a', encoding='utf-8') as f:
-            f.write(f"{task_name};0\n")
+            f.write(f"{task_name};0\n")  # Через mode='a' записываем данные на новую строку
         f.close()
         print('Задача успешно добавлена!')
-        action_menu(input())
+        action_menu(input())  # Ждем от пользователя следующей команды
 
 
 def view_tasks():
     status = {'0': 'Невыполненная', '1': 'Выполненная'}
     with open(f'{getcwd()}/tasks.txt', encoding='utf-8') as f:
         tasks_list = f.readlines()
-        if tasks_list:
-            tasks_list = list(map(lambda x: (x[:-3], status[x[-2:-1]]), tasks_list))
+        if tasks_list:  # Проверяем на наполнение списка задач                        # Упрощаем запись данных
+            tasks_list = list(map(lambda x: (x[:-3], status[x[-2:-1]]), tasks_list))  # с помощью map
             for task in enumerate(tasks_list):
                 print(f'Задача №{task[0] + 1}, Название: {task[1][0]}, Статус: {task[1][1]}')
         else:
@@ -40,18 +40,18 @@ def del_task():
             action_menu(task_num.lower())
         elif task_num.isalnum():
             try:
-                task_num = int(task_num)
+                task_num = int(task_num)  # Проверка исключений
             except:
                 print('Вы не ввели номер задачи, хотите вернуться в меню?')
-                back_menu('3')
+                back_menu('3')  # Отправляем в функцию back_menu значение функции del_task для корректной работы
             if 0 < task_num <= len(tasks_list):
                 del tasks_list[task_num - 1]
                 with open(f'{getcwd()}/tasks.txt', mode='w', encoding='utf-8') as f:
                     for task in tasks_list:
-                        f.write(task)
+                        f.write(task)  # Перезаписываем данные убирая из списка удаленную задачу
                 f.close()
                 print('Готово, задача удалена!')
-                action_menu(input())
+                action_menu(input())  # Ждем ответа от пользователя
             else:
                 print("Ошибка! Номер задачи должен быть натуральным числом \n"
                       "и не должен превышать максимальное количество задач.")
@@ -72,16 +72,16 @@ def status_task():
             action_menu(task_num.lower())
         elif task_num.isalnum():
             try:
-                task_num = int(task_num)
+                task_num = int(task_num)  # Проверка на исключение
             except:
                 print('Вы не ввели номер задачи, хотите вернуться в меню?')
                 back_menu('4')
             if 0 < task_num <= len(tasks_list):
-                if tasks_list[task_num - 1][-2] == '0':
-                    tasks_list[task_num - 1] = tasks_list[task_num - 1][:-2] + '1\n'
+                if tasks_list[task_num - 1][-2] == '0':  # Проверка статуса задачи в списке задач
+                    tasks_list[task_num - 1] = tasks_list[task_num - 1][:-2] + '1\n'  # Смена статуса
                     with open(f'{getcwd()}/tasks.txt', mode='w', encoding='utf-8') as f:
                         for task in tasks_list:
-                            f.write(task)
+                            f.write(task)  # Перезаписываем данные с обновленным стасусом
                     f.close()
                     print('Готово, задача отмечена выполненной!')
                     print(f"Задача №{task_num}, Название: {tasks_list[task_num - 1][:-3]}, Статус: Выполненная")
@@ -107,7 +107,7 @@ def help_menu():
 
 def action_menu(action):
     action_list = {'1': add_task, '2': view_tasks, '3': del_task, '4': status_task, 'm': menu, 'h': help_menu}
-    if action.lower() == 'q':
+    if action.lower() == 'q':  # Метод lower проверяет оба регистра при вводе значений
         sys.exit()
     elif action.lower() in {'1', '2', '3', '4', 'm'}:
         print("------------------------")
@@ -121,7 +121,7 @@ def action_menu(action):
 
 
 def menu():
-    print("Вот основное меню:", sep='\n')
+    print("Вот основное меню:")
     print("(1) Добавить задачу")
     print("(2) Просмотреть задачи")
     print("(3) Удалить задачу")
@@ -131,8 +131,8 @@ def menu():
     action_menu(input())
 
 
-def back_menu(num_action):
-    action = input('(y/n)')
+def back_menu(num_action):   # Функция back_menu дает возможность пользователю ввести данные несколько раз,
+    action = input('(y/n)')  # вместо того, чтобы отправлять его обратно в меню
     while action not in {'y', 'n'}:
         print("Введите 'y' или 'n'.")
         action = input('(y/n)')
