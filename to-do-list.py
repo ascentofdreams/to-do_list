@@ -30,40 +30,72 @@ def view_tasks():
 
 
 def del_task():
-    action_menu(input())
-
-
-def status_task():
-    print('Напишите номер задачи которую нужно отметить. (m) - возврат к меню')
-    task_num = input(f'Номер: ')
-    if task_num.lower() in {'m', 'q'}:
-        action_menu(task_num.lower())
-    elif task_num.isalnum():
-        task_num = int(task_num)
-        with open(f'{getcwd()}/tasks.txt', encoding='utf-8') as f:
-            tasks_list = f.readlines()
-        f.close()
-        if task_num <= len(tasks_list):
-            if tasks_list[task_num - 1][-2] == '0':
-                tasks_list[task_num - 1] = tasks_list[task_num - 1][:-2] + '1\n'
+    with open(f'{getcwd()}/tasks.txt', encoding='utf-8') as f:
+        tasks_list = f.readlines()
+    f.close()
+    if tasks_list:
+        print('Какую задачу вы хотите удалить?')
+        task_num = input(f'Номер: ')
+        if task_num.lower() in {'m', 'q'}:
+            action_menu(task_num.lower())
+        elif task_num.isalnum():
+            try:
+                task_num = int(task_num)
+            except:
+                print('Вы не ввели номер задачи, хотите вернуться в меню?')
+                back_menu('3')
+            if 0 < task_num <= len(tasks_list):
+                del tasks_list[task_num - 1]
                 with open(f'{getcwd()}/tasks.txt', mode='w', encoding='utf-8') as f:
                     for task in tasks_list:
                         f.write(task)
                 f.close()
-                print(f"Задача №{task_num}, Название: {tasks_list[task_num - 1][:-3]}, Статус: Выполненная")
+                print('Готово, задача удалена!')
                 action_menu(input())
             else:
-                print('Кажется эта задача уже является выполненной, хотите вернуться в меню?')
-                action = input('(y/n)')
-                while action not in {'y', 'n'}:
-                    print("Введите 'y' или 'n'.")
-                if action == 'y':
-                    action_menu('m')
-                elif action == 'n':
-                    status_task()
-        else:
-            print("Ошибка! Номер задачи превышает максимальное количество задач.")
-            action_menu('m')
+                print("Ошибка! Номер задачи должен быть натуральным числом \n"
+                      "и не должен превышать максимальное количество задач.")
+                action_menu('m')
+    else:
+        print('На данный момент задач нет.')
+        action_menu(input())
+
+
+def status_task():
+    with open(f'{getcwd()}/tasks.txt', encoding='utf-8') as f:
+        tasks_list = f.readlines()
+    f.close()
+    if tasks_list:
+        print('Напишите номер задачи которую нужно отметить. (m) - возврат к меню')
+        task_num = input(f'Номер: ')
+        if task_num.lower() in {'m', 'q'}:
+            action_menu(task_num.lower())
+        elif task_num.isalnum():
+            try:
+                task_num = int(task_num)
+            except:
+                print('Вы не ввели номер задачи, хотите вернуться в меню?')
+                back_menu('4')
+            if 0 < task_num <= len(tasks_list):
+                if tasks_list[task_num - 1][-2] == '0':
+                    tasks_list[task_num - 1] = tasks_list[task_num - 1][:-2] + '1\n'
+                    with open(f'{getcwd()}/tasks.txt', mode='w', encoding='utf-8') as f:
+                        for task in tasks_list:
+                            f.write(task)
+                    f.close()
+                    print('Готово, задача отмечена выполненной!')
+                    print(f"Задача №{task_num}, Название: {tasks_list[task_num - 1][:-3]}, Статус: Выполненная")
+                    action_menu(input())
+                else:
+                    print('Кажется эта задача уже является выполненной, хотите вернуться в меню?')
+                    back_menu('4')
+            else:
+                print("Ошибка! Номер задачи должен быть натуральным числом \n"
+                      "и не должен превышать максимальное количество задач.")
+                action_menu('m')
+    else:
+        print('На данный момент нельзя проверить статус задач, поскольку их нет.')
+        action_menu(input())
 
 
 def help_menu():
@@ -83,6 +115,9 @@ def action_menu(action):
     elif action.lower() in {'h', 'help'}:
         print("------------------------")
         action_list['h']()
+    else:
+        print('Вы не ввели номер действия, перенаправляю вас обратно в меню.')
+        menu()
 
 
 def menu():
@@ -94,6 +129,17 @@ def menu():
     print("(q) Выйти")
     print("Если вдруг что-то не понятно, (help/h) - выведет справку доступных команд")
     action_menu(input())
+
+
+def back_menu(num_action):
+    action = input('(y/n)')
+    while action not in {'y', 'n'}:
+        print("Введите 'y' или 'n'.")
+        action = input('(y/n)')
+    if action == 'y':
+        action_menu('m')
+    elif action == 'n':
+        action_menu(num_action)
 
 
 if __name__ == "__main__":
